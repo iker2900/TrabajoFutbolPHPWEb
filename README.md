@@ -1,39 +1,60 @@
-# FutbolDef
+# Gestor de Competición (PHP)
 
-FutbolDef es una aplicación web sencilla para gestionar información sobre partidos de fútbol y equipos.
+Proyecto académico de un gestor simple de una competición de fútbol, desarrollado íntegramente en PHP sin frameworks. El objetivo principal es aplicar una arquitectura limpia basada en la separación de responsabilidades (Vistas, Lógica y Persistencia de Datos), siguiendo el modelo del proyecto `ArteanV1` y los conceptos de "Clean Code".
 
-## Características
+## 🚀 Funcionalidades Principales
 
-*   **Listar y añadir equipos:** La aplicación permite ver una lista de los equipos de fútbol existentes y añadir nuevos equipos con su nombre y estadio.
-*   **Ver partidos por equipo:** Puedes seleccionar un equipo para ver todos los partidos que ha jugado, tanto de local como de visitante.
-*   **Filtrar partidos por jornada:** La aplicación permite filtrar los partidos por jornada para ver los resultados de una jornada específica.
-*   **Añadir nuevos partidos:** Puedes añadir nuevos partidos especificando los equipos local y visitante, el resultado, la jornada y el estadio.
+* **Gestión de Equipos:**
+    * Listar todos los equipos registrados.
+    * Añadir nuevos equipos a la base de datos (Nombre y Estadio).
+* **Gestión de Partidos:**
+    * Filtrar y mostrar partidos por jornada.
+    * Añadir nuevos partidos (Equipo Local, Visitante, Resultado, Estadio, Jornada).
+    * **Validación:** El sistema impide registrar un partido si los dos equipos ya han jugado entre sí (basado en la `UNIQUE KEY` de la BBDD).
+* **Navegación Específica:**
+    * Al hacer clic en un equipo, se accede a una página que muestra todos los partidos (locales y visitantes) de ese equipo.
+* **Lógica de Sesión:**
+    * El `index.php` actúa como un "router".
+    * Si el usuario no ha visitado nada, se le redirige a `equipos.php`.
+    * Si el usuario ha visitado la página de un equipo, la web lo "recuerda" (`$_SESSION['last_team_viewed']`) y su página de inicio será la de ese equipo.
 
-## Estructura del proyecto
+## 🛠️ Stack Tecnológico
 
-El proyecto sigue una estructura PHP tradicional, separando la lógica de la aplicación, la persistencia de datos y las plantillas.
+* **Backend:** PHP (Enfoque procedural y Orientado a Objetos).
+* **Base de Datos:** MySQL / MariaDB.
+* **Conector BBDD:** `mysqli` (con Prepared Statements para evitar inyección SQL).
+* **Frontend:** HTML5 y Bootstrap 5 (instalado localmente en `assets/`).
+* **Entorno de Desarrollo:** XAMPP (Apache + MySQL).
 
-*   `index.php`: El punto de entrada de la aplicación. Redirige al usuario a la página de equipos o a la última página de equipo visitada.
-*   `equipos.php`: Muestra la lista de equipos y un formulario para añadir nuevos.
-*   `partidos.php`: Muestra los partidos por jornada y un formulario para añadir nuevos partidos.
-*   `partidosEquipo.php`: Muestra los partidos de un equipo específico.
-*   `app/`: Contiene la lógica para añadir nuevos equipos y partidos.
-    *   `addEquipo.php`: Procesa el formulario para añadir un nuevo equipo.
-    *   `addPartido.php`: Procesa el formulario para añadir un nuevo partido.
-*   `persistence/`: Contiene la lógica de acceso a datos.
-    *   `conf/`: Archivos de configuración para la base de datos.
-    *   `DAO/`: Objetos de Acceso a Datos (DAO) para interactuar con la base de datos.
-*   `templates/`: Contiene las plantillas de la interfaz de usuario, como la cabecera y el pie de página.
-*   `utils/`: Contiene clases de utilidad, como `SessionHelper` para gestionar sesiones.
-*   `assets/`: Contiene los recursos estáticos, como archivos CSS y JavaScript.
+## 📁 Arquitectura del Proyecto
 
-## Cómo empezar
+El proyecto sigue una estricta separación de responsabilidades inspirada en `ArteanV1`:
 
-1.  **Configura tu entorno:** Asegúrate de tener un servidor web con PHP y una base de datos MySQL (u otra compatible) en funcionamiento.
-2.  **Importa la base de datos:** El script de la base de datos se encuentra en `persistence/database.sql`. Impórtalo en tu base de datos.
-3.  **Configura la conexión a la base de datos:** Edita el archivo `persistence/conf/db.conf` con tus credenciales de la base de datos.
-4.  **Inicia la aplicación:** Abre tu navegador y navega a la URL de tu proyecto.
+* `index.php`: Punto de entrada que gestiona la lógica de sesión y redirige.
+* **Vistas (Raíz):** (`equipos.php`, `partidos.php`, `partidosEquipo.php`). Son los archivos que contienen el HTML de Bootstrap y la lógica de *presentación* (bucles `foreach` para pintar datos).
+* `app/`: **Lógica de Aplicación (Controladores).**
+    * Scripts que procesan peticiones `$_POST` de los formularios.
+    * No contienen HTML, solo procesan datos y redirigen (`header("Location: ...")`).
+    * Ej: `app/addEquipo.php`, `app/addPartido.php`.
+* `persistence/`: **Capa de Persistencia (Modelo).**
+    * `conf/PersistentManager.php`: Clase que gestiona la conexión y desconexión con `mysqli`.
+    * `DAO/`: (Data Access Objects). Clases que contienen **exclusivamente** las consultas SQL (`SELECT`, `INSERT`, etc.) usando `Prepared Statements`.
+* `utils/`:
+    * `SessionHelper.php`: Clase de utilidad para centralizar el `session_start()` y el manejo de `$_SESSION`.
+* `templates/`:
+    * `header.php`: Plantilla HTML reutilizable que incluye el `navbar` de Bootstrap y la cabecera del HTML.
+* `assets/`:
+    * Contiene los archivos locales de `css/` y `js/` de Bootstrap.
 
-## Contribuir
+## ⚙️ Instalación y Puesta en Marcha (XAMPP)
 
-Las contribuciones son bienvenidas. Si quieres mejorar la aplicación, por favor, abre un _issue_ o envía un _pull request_.
+1.  Clona o descarga este repositorio.
+2.  Mueve la carpeta completa del proyecto (ej: `Futbol`) a tu directorio `htdocs` de XAMPP (ej: `C:\xampp\htdocs\Futbol`).
+3.  Inicia los servicios de **Apache** y **MySQL** desde el panel de control de XAMPP.
+4.  Abre un gestor de BBDD (HeidiSQL, phpMyAdmin) y conéctate a tu servidor local (Usuario: `root`, Contraseña: *vacía*).
+5.  Ejecuta el script SQL completo (`CREATE DATABASE...`) proporcionado en el proyecto para crear la BBDD `competicion` y sus tablas (`equipos`, `partidos`).
+6.  Abre tu navegador web y accede a:
+    ```
+    http://localhost/Futbol/
+    ```
+7.  El `index.php` te redirigirá automáticamente a la página de `equipos.php`.
